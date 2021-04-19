@@ -1,12 +1,12 @@
 import NodeGit from 'nodegit';
 
-async function getRepository(
+export async function getRepository(
   path = process.cwd(),
 ): Promise<NodeGit.Repository> {
   return await NodeGit.Repository.open(path);
 }
 
-async function getLocalBranches(
+export async function getLocalBranches(
   repo: NodeGit.Repository,
 ): Promise<NodeGit.Reference[]> {
   const references = await repo.getReferences();

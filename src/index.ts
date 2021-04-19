@@ -1,34 +1,62 @@
 import express from 'express';
-import path from 'path';
+import exphbs from 'express-handlebars';
+import chokidar from 'chokidar';
 
-const app = express();
+import { getRepository, getLocalBranches } from './git-utils';
 
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname + '/index.html'));
-});
+async function main() {
+  const app = express();
+  const repo = await getRepository();
 
-app.get('/messages', async function (req, res) {
-  console.log('Got /messages');
-  res.set({
-    'Cache-Control': 'no-cache',
-    'Content-Type': 'text/event-stream',
-    Connection: 'keep-alive',
+  const viewInstance = exphbs.create({ extname: 'hbs' });
+
+  app.engine('hbs', viewInstance.engine);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'hbs');
+
+  app.get('/', function (req, res) {
+    res.render('index');
   });
-  res.flushHeaders();
 
-  // Tell the client to retry every 10 seconds if connectivity is lost
-  res.write('retry: 10000\n\n');
-  let count = 0;
+  app.get('/branches', async function (req, res) {
+    const branches = await getLocalBranches(repo);
+    const branchNames = branches.map((branch) => branch.name());
 
-  while (true) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    res.render('branches', { branches: branchNames });
+  });
 
-    console.log('Emit', ++count);
-    // Emit an SSE that contains the current 'count' as a string
-    res.write(
-      `data: <turbo-stream action="append" target="messages"><template><div id="message_${count}">div #${count}.</div></template></turbo-stream>\n\n`,
-    );
-  }
-});
+  app.get('/branches/sse', async function (req, res) {
+    res.set({
+      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream',
+      Connection: 'keep-alive',
+    });
+    res.flushHeaders();
 
-app.listen(8080, () => console.log('listening...'));
+    // Tell the client to retry every 10 seconds if connectivity is lost
+    res.write('retry: 10000\n\n');
+
+    chokidar
+      .watch(process.cwd() + '/.git/refs/heads', { ignoreInitial: true })
+      .on('all', async () => {
+        try {
+          const branches = await getLocalBranches(repo);
+          const branchNames = branches.map((branch) => branch.name());
+          const template = await viewInstance.render(
+            __dirname + '/views/branches-sse.hbs',
+            { branches: branchNames },
+          );
+          const line = template.replaceAll('\n', '');
+          res.write(`data: ${line}\n\n`);
+        } catch (e) {
+          console.error(e.message);
+        }
+      });
+  });
+
+  const PORT = 8080;
+
+  app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
+}
+
+main();
