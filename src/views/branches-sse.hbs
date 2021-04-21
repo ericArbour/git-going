@@ -2,7 +2,7 @@
   <template>
     <ul>
       {{#each branches}}
-      <li>{{this}}</li>
+      <li><a href="/branch/{{this}}" data-turbo-frame="branch">{{this}}</a></li>
       {{/each}}
     </ul>
   </template>

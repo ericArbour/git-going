@@ -6,6 +6,13 @@ export async function getRepository(
   return await NodeGit.Repository.open(path);
 }
 
+export async function getBranch(
+  repo: NodeGit.Repository,
+  branchName: string,
+): Promise<NodeGit.Reference> {
+  return await repo.getReference(branchName);
+}
+
 export async function getLocalBranches(
   repo: NodeGit.Repository,
 ): Promise<NodeGit.Reference[]> {
@@ -20,7 +27,7 @@ async function getRemoteBranches(
   return references.filter((reference) => reference.isRemote());
 }
 
-async function getBranchCommits(
+export async function getBranchCommits(
   repo: NodeGit.Repository,
   branch: NodeGit.Reference,
 ): Promise<NodeGit.Commit[]> {

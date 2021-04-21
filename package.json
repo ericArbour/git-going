@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "start": "npm run build && node dist/index.js",
-    "start:dev": "npm run build && nodemon --ext \".ts,.js\" --watch \"./src\" --exec \"ts-node ./src/index.ts\""
+    "start:dev": "npm run build && nodemon --ext \".ts,.js,.hbs\" --watch \"./src\" --exec \"ts-node ./src/index.ts\""
   },
   "author": "",
   "license": "ISC",
