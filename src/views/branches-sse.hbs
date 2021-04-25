@@ -1,9 +1,5 @@
 <turbo-stream action="update" target="branches">
   <template>
-    <ul>
-      {{#each branches}}
-      <li><a href="/branch/{{this}}" data-turbo-frame="branch">{{this}}</a></li>
-      {{/each}}
-    </ul>
+    {{> branches-list}}
   </template>
 </turbo-stream>

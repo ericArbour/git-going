@@ -65,13 +65,46 @@ async function main() {
   });
 
   app.get('/branch/:name', async function (req, res) {
-    console.log('hit');
     const name = req.params.name;
     const branch = await getBranch(repo, name);
     const commits = await getBranchCommits(repo, branch);
     const commitMessages = commits.map((commit) => commit.message());
 
-    res.render('branch', { commits: commitMessages });
+    res.render('branch', { commits: commitMessages, branchName: name });
+  });
+
+  app.get('/branch/sse/:name', async function (req, res) {
+    const name = req.params.name;
+
+    res.set({
+      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream',
+      Connection: 'keep-alive',
+    });
+    res.flushHeaders();
+
+    // Tell the client to retry every 10 seconds if connectivity is lost
+    res.write('retry: 10000\n\n');
+
+    chokidar
+      .watch(process.cwd() + '/.git/objects', { ignoreInitial: true })
+      .on('all', async () => {
+        console.log('objects hit');
+        try {
+          const branch = await getBranch(repo, name);
+          const commits = await getBranchCommits(repo, branch);
+          const commitMessages = commits.map((commit) => commit.message());
+          const template = await viewInstance.render(
+            __dirname + '/views/branch-sse.hbs',
+            { commits: commitMessages, branchName: name },
+          );
+          const line = template.replaceAll('\n', '');
+
+          res.write(`data: ${line}\n\n`);
+        } catch (e) {
+          console.error(e.message);
+        }
+      });
   });
 
   const PORT = 8080;

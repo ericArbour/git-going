@@ -1,0 +1,8 @@
+<div>
+  <h2>Branches</h2>
+  <ul>
+    {{#each branches}}
+    <li><a href="/branch/{{this}}" data-turbo-frame="branch">{{this}}</a></li>
+    {{/each}}
+  </ul>
+</div>

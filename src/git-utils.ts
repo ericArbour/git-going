@@ -34,15 +34,5 @@ export async function getBranchCommits(
   const walker = repo.createRevWalk();
   walker.push(branch.target());
 
-  return await walker.getCommits(10);
-}
-
-export async function test() {
-  const repo = await getRepository();
-  const branches = await getLocalBranches(repo);
-  const branch = branches[0];
-  if (branch) {
-    const commits = await getBranchCommits(repo, branch);
-    commits.forEach((commit) => console.log(commit.message()));
-  }
+  return await walker.getCommits(100);
 }
