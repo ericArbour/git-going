@@ -2,11 +2,11 @@
   "name": "git-going",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node dist/index.js",
-    "start:dev": "npm run build && nodemon --ext \".ts,.js,.hbs\" --watch \"./src\" --exec \"ts-node ./src/index.ts\""
+    "start": "npm run build && node dist/app.js",
+    "start:dev": "npm run build && nodemon --ext \".ts,.js,.hbs\" --watch \"./src\" --exec \"ts-node ./src/app.ts\""
   },
   "author": "",
   "license": "ISC",
