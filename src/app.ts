@@ -1,5 +1,6 @@
 import express from 'express';
 import exphbs from 'express-handlebars';
+import path from 'path';
 import chokidar from 'chokidar';
 
 import {
@@ -18,6 +19,7 @@ async function main() {
   app.engine('hbs', viewInstance.engine);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'hbs');
+  app.use(express.static(path.resolve(__dirname, '../public')));
 
   app.get('/', function (req, res) {
     res.render('index');

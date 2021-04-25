@@ -2,8 +2,4 @@
   <turbo-frame id="branches" src="/branches"></turbo-frame>
   <turbo-frame id="branch"></turbo-frame>
 </body>
-<script type="module">
-  import * as Turbo from 'https://cdn.skypack.dev/@hotwired/turbo';
-  Turbo.connectStreamSource(new EventSource("/branches/sse"));
-  Turbo.connectStreamSource(new EventSource("/branch/sse/main"));
-</script>
+<script type="module" src="/main.js"></script>
