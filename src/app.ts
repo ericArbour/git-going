@@ -14,7 +14,10 @@ async function main() {
   const app = express();
   const repo = await getRepository();
 
-  const viewInstance = exphbs.create({ extname: 'hbs' });
+  const viewInstance = exphbs.create({
+    extname: 'hbs',
+    partialsDir: path.join(__dirname, 'views/partials'),
+  });
 
   app.engine('hbs', viewInstance.engine);
   app.set('views', __dirname + '/views');
@@ -91,7 +94,7 @@ async function main() {
     chokidar
       .watch(process.cwd() + '/.git/objects', { ignoreInitial: true })
       .on('all', async () => {
-        console.log('objects hit');
+        console.log('hit');
         try {
           const branch = await getBranch(repo, name);
           const commits = await getBranchCommits(repo, branch);

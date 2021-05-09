@@ -7,3 +7,7 @@ declare module 'https://*';
 declare module 'https://cdn.skypack.dev/@hotwired/turbo' {
   export * from '@hotwired/turbo';
 }
+
+declare module 'https://cdn.skypack.dev/stimulus' {
+  export * from 'stimulus';
+}
