@@ -40,6 +40,8 @@ async function main() {
   app.get('/branches/sse', async function (req, res) {
     console.log('connected to /branches/see');
 
+    const path = '/.git/refs/heads';
+
     res.set({
       'Cache-Control': 'no-cache',
       'Content-Type': 'text/event-stream',
@@ -50,12 +52,12 @@ async function main() {
     // Tell the client to retry every 10 seconds if connectivity is lost
     res.write('retry: 10000\n\n');
 
-    const watcher = chokidar.watch(process.cwd() + '/.git/refs/heads', {
+    const watcher = chokidar.watch(process.cwd() + path, {
       ignoreInitial: true,
     });
 
     watcher.on('all', async () => {
-      console.log('/.git/refs/heads change detected');
+      console.log(`${path} change detected`);
       try {
         const branches = await getLocalBranches(repo);
         const branchNames = branches.map((branch) =>
@@ -72,28 +74,30 @@ async function main() {
         console.error(e.message);
       }
     });
-    console.log('watching for changes in /.git/refs/heads');
+    console.log(`watching for changes in ${path}`);
 
     res.on('close', () => {
       console.log('disconnected from /branches/see');
       watcher.close().then(() => {
-        console.log('/.git/refs/heads watcher closed');
+        console.log(`${path} watcher closed`);
       });
     });
   });
 
   app.get('/branch/:name', async function (req, res) {
-    const name = req.params.name;
-    const branch = await getBranch(repo, name);
+    const branchName = req.params.name;
+    const branch = await getBranch(repo, branchName);
     const commits = await getBranchCommits(repo, branch);
     const commitMessages = commits.map((commit) => commit.message());
 
-    res.render('branch', { commits: commitMessages, branchName: name });
+    res.render('branch', { commits: commitMessages, branchName });
   });
 
   app.get('/branch/sse/:name', async function (req, res) {
-    const name = req.params.name;
-    console.log(`connected to /branches/see/${name}`);
+    const branchName = req.params.name;
+    console.log(`connected to /branches/see/${branchName}`);
+
+    const path = `/.git/refs/heads/${branchName}`;
 
     res.set({
       'Cache-Control': 'no-cache',
@@ -105,19 +109,19 @@ async function main() {
     // Tell the client to retry every 10 seconds if connectivity is lost
     res.write('retry: 10000\n\n');
 
-    const watcher = chokidar.watch(process.cwd() + '/.git/objects', {
+    const watcher = chokidar.watch(process.cwd() + path, {
       ignoreInitial: true,
     });
 
     watcher.on('all', async () => {
-      console.log('/.git/objects change detected');
+      console.log(`${path} change detected`);
       try {
-        const branch = await getBranch(repo, name);
+        const branch = await getBranch(repo, branchName);
         const commits = await getBranchCommits(repo, branch);
         const commitMessages = commits.map((commit) => commit.message());
         const template = await viewInstance.render(
           __dirname + '/views/branch-sse.hbs',
-          { commits: commitMessages, branchName: name },
+          { commits: commitMessages, branchName },
         );
         const line = template.replaceAll('\n', '');
 
@@ -126,11 +130,11 @@ async function main() {
         console.error(e.message);
       }
     });
-    console.log('watching for changes in /.git/objects');
+    console.log(`watching for changes in ${path}`);
 
     res.on('close', () => {
-      console.log(`disconnected from /branches/see/${name}`);
-      watcher.close().then(() => console.log('/.git/objects watcher closed'));
+      console.log(`disconnected from /branches/see/${branchName}`);
+      watcher.close().then(() => console.log(`${path} watcher closed`));
     });
   });
 
