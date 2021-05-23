@@ -1,3 +1,7 @@
 <turbo-frame id="branch">
-  {{> branch-details}}
+  <div data-controller="branch" data-branch-name-value="{{branchName}}">
+    <turbo-frame id="branch-details">
+      {{> branch-details}}
+    </turbo-frame>
+  </div>
 </turbo-frame>
