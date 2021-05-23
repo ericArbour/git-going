@@ -4,10 +4,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "copy-files": "copyfiles -u 1 ./src/views/* ./src/views/**/* ./dist",
-    "build": "rimraf ./dist ./public && tsc --build && copy-files",
+    "copy-views": "copyfiles -u 1 ./src/views/* ./src/views/**/* ./dist",
+    "cleanup": "rimraf ./dist ./public",
+    "build": "npm run cleanup && tsc --build && npm run copy-views",
     "start": "npm run build && node dist/app.js",
-    "start:dev": "rimraf ./dist && tsc --build ./src && nodemon"
+    "start:dev": "nodemon"
   },
   "author": "",
   "license": "ISC",
