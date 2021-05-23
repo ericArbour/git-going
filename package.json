@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "rimraf ./dist ./public && tsc --build",
+    "copy-files": "copyfiles -u 1 ./src/views/* ./src/views/**/* ./dist",
+    "build": "rimraf ./dist ./public && tsc --build && copy-files",
     "start": "npm run build && node dist/app.js",
     "start:dev": "rimraf ./dist && tsc --build ./src && nodemon"
   },
@@ -16,6 +17,7 @@
     "@types/express-handlebars": "^3.1.0",
     "@types/node": "^14.14.37",
     "@types/nodegit": "^0.27.0",
+    "copyfiles": "^2.4.1",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
