@@ -5,11 +5,21 @@ import {
 } from 'https://cdn.skypack.dev/@hotwired/turbo';
 
 export class BranchController extends Controller {
+  static values = { name: String };
+
+  readonly nameValue?: string;
+
   eventSource?: EventSource;
 
   connect() {
-    this.eventSource = new EventSource('/branch/sse/main');
-    connectStreamSource(this.eventSource);
+    if (typeof this.nameValue === 'string') {
+      const path = `/branch/sse/${this.nameValue}`;
+      console.log(`connecting to stream source ${path}`);
+      this.eventSource = new EventSource(path);
+      connectStreamSource(this.eventSource);
+    } else {
+      console.error('Cannot connect to stream source: invalid branch name');
+    }
   }
 
   disconnect() {
