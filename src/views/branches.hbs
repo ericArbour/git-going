@@ -1,3 +1,8 @@
 <turbo-frame id="branches">
-  {{> branches-list}}
+  <div data-controller="branches">
+    <h2>Branches</h2>
+    <turbo-frame id="branch-list">
+      {{> branches-list}}
+    </turbo-frame>
+  </div>
 </turbo-frame>
