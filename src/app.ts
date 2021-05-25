@@ -113,21 +113,32 @@ async function main() {
       ignoreInitial: true,
     });
 
-    watcher.on('all', async () => {
-      console.log(`${path} change detected`);
-      try {
-        const branch = await getBranch(repo, branchName);
-        const commits = await getBranchCommits(repo, branch);
-        const commitMessages = commits.map((commit) => commit.message());
+    watcher.on('all', async (event) => {
+      console.log(`${path} change detected of type ${event}`);
+
+      if (event === 'unlink') {
         const template = await viewInstance.render(
-          __dirname + '/views/branch-sse.hbs',
-          { commits: commitMessages, branchName },
+          __dirname + '/views/branch-reset-sse.hbs',
+          {},
         );
         const line = template.replaceAll('\n', '');
 
         res.write(`data: ${line}\n\n`);
-      } catch (e) {
-        console.error(e.message);
+      } else {
+        try {
+          const branch = await getBranch(repo, branchName);
+          const commits = await getBranchCommits(repo, branch);
+          const commitMessages = commits.map((commit) => commit.message());
+          const template = await viewInstance.render(
+            __dirname + '/views/branch-sse.hbs',
+            { commits: commitMessages, branchName },
+          );
+          const line = template.replaceAll('\n', '');
+
+          res.write(`data: ${line}\n\n`);
+        } catch (e) {
+          console.error(e.message);
+        }
       }
     });
     console.log(`watching for changes in ${path}`);
