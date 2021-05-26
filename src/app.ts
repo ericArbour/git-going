@@ -8,6 +8,7 @@ import {
   getBranch,
   getLocalBranches,
   getBranchCommits,
+  commitToViewCommit,
 } from './git-utils';
 
 async function main() {
@@ -88,9 +89,12 @@ async function main() {
     const branchName = req.params.name;
     const branch = await getBranch(repo, branchName);
     const commits = await getBranchCommits(repo, branch);
-    const commitMessages = commits.map((commit) => commit.message());
+    const viewCommits = commits.map(commitToViewCommit);
 
-    res.render('branch', { commits: commitMessages, branchName });
+    res.render('branch', {
+      commits: viewCommits,
+      branchName,
+    });
   });
 
   app.get('/branch/sse/:name', async function (req, res) {
@@ -128,10 +132,10 @@ async function main() {
         try {
           const branch = await getBranch(repo, branchName);
           const commits = await getBranchCommits(repo, branch);
-          const commitMessages = commits.map((commit) => commit.message());
+          const viewCommits = commits.map(commitToViewCommit);
           const template = await viewInstance.render(
             __dirname + '/views/branch-sse.hbs',
-            { commits: commitMessages, branchName },
+            { commits: viewCommits, branchName },
           );
           const line = template.replaceAll('\n', '');
 

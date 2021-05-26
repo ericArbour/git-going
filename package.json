@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "copy-views": "copyfiles -u 1 ./src/views/* ./src/views/**/* ./dist",
-    "cleanup": "rimraf ./dist ./public",
+    "cleanup": "rimraf ./dist ./public/js",
     "build": "npm run cleanup && tsc --build && npm run copy-views",
     "start": "npm run build && node dist/app.js",
     "start:dev": "nodemon"

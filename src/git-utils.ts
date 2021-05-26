@@ -36,3 +36,15 @@ export async function getBranchCommits(
 
   return await walker.getCommits(100);
 }
+
+export interface ViewCommit {
+  sha: string;
+  message: string;
+}
+
+export function commitToViewCommit(commit: NodeGit.Commit): ViewCommit {
+  return {
+    sha: commit.sha().substring(0, 7),
+    message: commit.message(),
+  };
+}

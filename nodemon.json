@@ -1,5 +1,5 @@
 {
   "ext": ".ts,.js,.hbs",
   "watch": ["./src", "./client"],
-  "exec": "rimraf ./public && tsc --build ./client && ts-node --project ./src/tsconfig.json ./src/app.ts"
+  "exec": "rimraf ./public/js && tsc --build ./client && ts-node --project ./src/tsconfig.json ./src/app.ts"
 }

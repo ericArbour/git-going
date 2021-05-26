@@ -3,7 +3,7 @@
   <h4>Commits</h4>
   <ul>
     {{#each commits}}
-    <li>{{this}}</li>
+    <li>{{this.sha}} - {{this.message}}</li>
     {{/each}}
   </ul>
 </div>
