@@ -1,7 +1,7 @@
 {
   "references": [
     { "path": "./src" },
-    { "path": "./client" }
+    { "path": "./client/ts" }
   ],
   "files": []
 }

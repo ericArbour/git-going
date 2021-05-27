@@ -5,8 +5,10 @@
   "main": "app.js",
   "scripts": {
     "copy-views": "copyfiles -u 1 ./src/views/* ./src/views/**/* ./dist",
+    "copy-css": "copyfiles -u 1 ./client/css/* ./public",
+    "copy-files": "npm run copy-views && npm run copy-css",
     "cleanup": "rimraf ./dist ./public/js",
-    "build": "npm run cleanup && tsc --build && npm run copy-views",
+    "build": "npm run cleanup && tsc --build && npm run copy-files",
     "start": "npm run build && node dist/app.js",
     "start:dev": "nodemon"
   },
