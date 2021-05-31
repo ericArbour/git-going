@@ -1,8 +1,6 @@
 import NodeGit from 'nodegit';
 
-export async function getRepository(
-  path = process.cwd(),
-): Promise<NodeGit.Repository> {
+export async function getRepository(path: string): Promise<NodeGit.Repository> {
   return await NodeGit.Repository.open(path);
 }
 

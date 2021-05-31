@@ -2,6 +2,8 @@ import express from 'express';
 import exphbs from 'express-handlebars';
 import path from 'path';
 import chokidar from 'chokidar';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 import {
   getRepository,
@@ -12,8 +14,33 @@ import {
 } from './git-utils';
 
 async function main() {
+  const argv = await yargs(hideBin(process.argv))
+    .scriptName('git-going')
+    .usage('Usage: $0 [args]')
+    .example(
+      '$0 -d ./my-project -p 3000',
+      'runs git-going on a specific directory and port',
+    )
+    .option('d', {
+      alias: 'directory',
+      type: 'string',
+      describe:
+        'a directory that contains a .git subdirectory - defaults to process.cwd()',
+      nargs: 1,
+      default: process.cwd(),
+    })
+    .option('p', {
+      alias: 'port',
+      type: 'number',
+      describe: 'the port to run the web server',
+      nargs: 1,
+      default: 8080,
+    })
+    .help('h')
+    .alias('h', 'help').argv;
+
   const app = express();
-  const repo = await getRepository();
+  const repo = await getRepository(argv.d);
 
   const viewInstance = exphbs.create({
     extname: 'hbs',
@@ -153,9 +180,7 @@ async function main() {
     });
   });
 
-  const PORT = 8080;
-
-  app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
+  app.listen(argv.p, () => console.log(`Listening on port ${argv.p}...`));
 }
 
 main();
