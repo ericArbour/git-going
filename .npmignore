@@ -1,0 +1,6 @@
+client
+node_modules
+src
+.gitignore
+nodemon.json
+tsconfig.json
