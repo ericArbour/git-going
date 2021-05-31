@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import express from 'express';
 import exphbs from 'express-handlebars';
 import path from 'path';
