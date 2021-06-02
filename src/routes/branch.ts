@@ -1,3 +1,4 @@
+import path from 'path';
 import { RequestHandler } from 'express';
 import chokidar from 'chokidar';
 import { commitToViewCommit, getBranch, getBranchCommits } from '../git-utils';
@@ -19,7 +20,7 @@ export const branchSsehandler: RequestHandler = async (req, res) => {
   const branchName = req.params.name;
   const repo = req.app.get('repo');
   const viewInstance = req.app.get('view-instance');
-  const path = `/.git/refs/heads/${branchName}`;
+  const branchPath = `/.git/refs/heads/${branchName}`;
 
   console.log(`connected to /branches/see/${branchName}`);
 
@@ -33,16 +34,16 @@ export const branchSsehandler: RequestHandler = async (req, res) => {
   // Tell the client to retry every 10 seconds if connectivity is lost
   res.write('retry: 10000\n\n');
 
-  const watcher = chokidar.watch(process.cwd() + path, {
+  const watcher = chokidar.watch(process.cwd() + branchPath, {
     ignoreInitial: true,
   });
 
   watcher.on('all', async (event) => {
-    console.log(`${path} change detected of type ${event}`);
+    console.log(`${branchPath} change detected of type ${event}`);
 
     if (event === 'unlink') {
       const template = await viewInstance.render(
-        __dirname + '/views/branch-reset-sse.hbs',
+        path.join(__dirname, '../views/branch-reset-sse.hbs'),
         {},
       );
       const line = template.replaceAll('\n', '');
@@ -54,7 +55,7 @@ export const branchSsehandler: RequestHandler = async (req, res) => {
         const commits = await getBranchCommits(repo, branch);
         const viewCommits = commits.map(commitToViewCommit);
         const template = await viewInstance.render(
-          __dirname + '/views/branch-sse.hbs',
+          path.join(__dirname, '../views/branch-sse.hbs'),
           { commits: viewCommits, branchName },
         );
         const line = template.replaceAll('\n', '');
@@ -65,10 +66,10 @@ export const branchSsehandler: RequestHandler = async (req, res) => {
       }
     }
   });
-  console.log(`watching for changes in ${path}`);
+  console.log(`watching for changes in ${branchPath}`);
 
   res.on('close', () => {
     console.log(`disconnected from /branches/see/${branchName}`);
-    watcher.close().then(() => console.log(`${path} watcher closed`));
+    watcher.close().then(() => console.log(`${branchPath} watcher closed`));
   });
 };

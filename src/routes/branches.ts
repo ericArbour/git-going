@@ -1,3 +1,4 @@
+import path from 'path';
 import chokidar from 'chokidar';
 import { RequestHandler } from 'express';
 
@@ -16,7 +17,7 @@ export const branchesHandler: RequestHandler = async (req, res) => {
 export const branchesSseHandler: RequestHandler = async (req, res) => {
   const repo = req.app.get('repo');
   const viewInstance = req.app.get('view-instance');
-  const path = '/.git/refs/heads';
+  const branchesPath = '/.git/refs/heads';
 
   console.log('connected to /branches/see');
 
@@ -30,19 +31,19 @@ export const branchesSseHandler: RequestHandler = async (req, res) => {
   // Tell the client to retry every 10 seconds if connectivity is lost
   res.write('retry: 10000\n\n');
 
-  const watcher = chokidar.watch(process.cwd() + path, {
+  const watcher = chokidar.watch(process.cwd() + branchesPath, {
     ignoreInitial: true,
   });
 
   watcher.on('all', async () => {
-    console.log(`${path} change detected`);
+    console.log(`${branchesPath} change detected`);
     try {
       const branches = await getLocalBranches(repo);
       const branchNames = branches.map((branch) =>
         branch.name().replace('refs/heads/', ''),
       );
       const template = await viewInstance.render(
-        __dirname + '/views/branches-sse.hbs',
+        path.join(__dirname, '../views/branches-sse.hbs'),
         { branches: branchNames },
       );
       const line = template.replaceAll('\n', '');
@@ -52,12 +53,12 @@ export const branchesSseHandler: RequestHandler = async (req, res) => {
       console.error(e.message);
     }
   });
-  console.log(`watching for changes in ${path}`);
+  console.log(`watching for changes in ${branchesPath}`);
 
   res.on('close', () => {
     console.log('disconnected from /branches/see');
     watcher.close().then(() => {
-      console.log(`${path} watcher closed`);
+      console.log(`${branchesPath} watcher closed`);
     });
   });
 };
