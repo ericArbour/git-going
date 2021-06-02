@@ -14,11 +14,11 @@ export const branchesHandler: RequestHandler = async (req, res) => {
 };
 
 export const branchesSseHandler: RequestHandler = async (req, res) => {
-  console.log('connected to /branches/see');
-
   const repo = req.app.get('repo');
   const viewInstance = req.app.get('view-instance');
   const path = '/.git/refs/heads';
+
+  console.log('connected to /branches/see');
 
   res.set({
     'Cache-Control': 'no-cache',
