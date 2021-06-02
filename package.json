@@ -1,10 +1,10 @@
 {
-  "name": "git-going-cli",
-  "version": "0.1.0",
+  "name": "git-vis",
+  "version": "0.1.1",
   "description": "",
   "main": "app.js",
   "bin": {
-    "git-going": "dist/app.js"
+    "git-vis": "dist/app.js"
   },
   "scripts": {
     "copy-views": "copyfiles -u 1 ./src/views/* ./src/views/**/* ./dist",

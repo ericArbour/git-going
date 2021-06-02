@@ -17,11 +17,11 @@ import {
 
 async function main() {
   const argv = await yargs(hideBin(process.argv))
-    .scriptName('git-going')
+    .scriptName('git-vis')
     .usage('Usage: $0 [args]')
     .example(
       '$0 -d ./my-project -p 3000',
-      'runs git-going on a specific directory and port',
+      'runs git-vis on a specific directory and port',
     )
     .option('d', {
       alias: 'directory',
