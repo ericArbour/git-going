@@ -46,7 +46,7 @@ export const branchesSseHandler: RequestHandler = async (req, res) => {
         path.join(__dirname, '../views/branches-sse.hbs'),
         { branches: branchNames },
       );
-      const line = template.replaceAll('\n', '');
+      const line = template.replace(/\n/g, '');
 
       res.write(`data: ${line}\n\n`);
     } catch (e) {

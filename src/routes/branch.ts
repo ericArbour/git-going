@@ -46,7 +46,7 @@ export const branchSsehandler: RequestHandler = async (req, res) => {
         path.join(__dirname, '../views/branch-reset-sse.hbs'),
         {},
       );
-      const line = template.replaceAll('\n', '');
+      const line = template.replace(/\n/g, '');
 
       res.write(`data: ${line}\n\n`);
     } else {
@@ -58,7 +58,7 @@ export const branchSsehandler: RequestHandler = async (req, res) => {
           path.join(__dirname, '../views/branch-sse.hbs'),
           { commits: viewCommits, branchName },
         );
-        const line = template.replaceAll('\n', '');
+        const line = template.replace(/\n/g, '');
 
         res.write(`data: ${line}\n\n`);
       } catch (e) {
