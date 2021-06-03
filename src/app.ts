@@ -42,6 +42,9 @@ async function main() {
   const viewInstance = exphbs.create({
     extname: 'hbs',
     partialsDir: path.join(__dirname, 'views/partials'),
+    helpers: {
+      encodeURIComponent,
+    },
   });
   app.engine('hbs', viewInstance.engine);
 

@@ -1,5 +1,5 @@
 <turbo-frame id="branch">
-  <div data-controller="branch" data-branch-name-value="{{branchName}}">
+  <div data-controller="branch" data-branch-name-value="{{encodeURIComponent branchName}}">
     <turbo-frame id="branch-details">
       {{> branch-details}}
     </turbo-frame>
