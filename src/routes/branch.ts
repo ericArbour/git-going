@@ -4,16 +4,20 @@ import chokidar from 'chokidar';
 import { commitToViewCommit, getBranch, getBranchCommits } from '../git-utils';
 
 export const branchHandler: RequestHandler = async (req, res) => {
-  const branchName = req.params.name;
-  const repo = req.app.get('repo');
-  const branch = await getBranch(repo, branchName);
-  const commits = await getBranchCommits(repo, branch);
-  const viewCommits = commits.map(commitToViewCommit);
+  try {
+    const branchName = req.params.name;
+    const repo = req.app.get('repo');
+    const branch = await getBranch(repo, branchName);
+    const commits = await getBranchCommits(repo, branch);
+    const viewCommits = commits.map(commitToViewCommit);
 
-  res.render('branch', {
-    commits: viewCommits,
-    branchName,
-  });
+    res.render('branch', {
+      commits: viewCommits,
+      branchName,
+    });
+  } catch (e) {
+    res.status(404).send(e.message);
+  }
 };
 
 export const branchSsehandler: RequestHandler = async (req, res) => {
