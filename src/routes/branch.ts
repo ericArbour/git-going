@@ -18,8 +18,9 @@ branchRouter.get('/branch/:name', async (req, res) => {
     const commitSummaries = commits.map(commitToCommitSummary);
 
     res.render('branch', {
+      name: branchName,
+      isHead: branch.isHead(),
       commits: commitSummaries,
-      branchName,
     });
   } catch (e) {
     res.status(404).send(e.message);
@@ -32,6 +33,7 @@ branchRouter.get('/branch/sse/:name', async (req, res) => {
   const directory = req.app.get('directory');
   const viewInstance = req.app.get('view-instance');
   const branchPath = `${directory}/.git/refs/heads/${branchName}`;
+  const headPath = `${directory}/.git/HEAD`;
 
   console.log(`connected to /branches/see/${branchName}`);
 
@@ -45,7 +47,7 @@ branchRouter.get('/branch/sse/:name', async (req, res) => {
   // Tell the client to retry every 10 seconds if connectivity is lost
   res.write('retry: 10000\n\n');
 
-  const watcher = chokidar.watch(branchPath, {
+  const watcher = chokidar.watch([branchPath, headPath], {
     ignoreInitial: true,
   });
 
@@ -67,7 +69,11 @@ branchRouter.get('/branch/sse/:name', async (req, res) => {
         const commitSummaries = commits.map(commitToCommitSummary);
         const template = await viewInstance.render(
           path.join(__dirname, '../views/branch-sse.hbs'),
-          { commits: commitSummaries, branchName },
+          {
+            name: branchName,
+            isHead: branch.isHead(),
+            commits: commitSummaries,
+          },
         );
         const line = template.replace(/\n/g, '');
 
