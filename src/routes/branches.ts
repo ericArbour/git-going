@@ -1,13 +1,14 @@
 import path from 'path';
 import { Router } from 'express';
 import chokidar from 'chokidar';
+import NodeGit from 'nodegit';
 
 import { branchToBranchSummary, getLocalBranches } from '../git-utils';
 
 const branchesRouter = Router();
 
 branchesRouter.get('/branches', async (req, res) => {
-  const repo = req.app.get('repo');
+  const repo = req.app.get('repo') as NodeGit.Repository;
   const branches = await getLocalBranches(repo);
   const branchSummaries = branches.map(branchToBranchSummary);
 
@@ -15,9 +16,9 @@ branchesRouter.get('/branches', async (req, res) => {
 });
 
 branchesRouter.get('/branches/sse', async (req, res) => {
-  const repo = req.app.get('repo');
-  const directory = req.app.get('directory');
-  const viewInstance = req.app.get('view-instance');
+  const repo = req.app.get('repo') as NodeGit.Repository;
+  const directory = req.app.get('directory') as string;
+  const viewInstance = req.app.get('view-instance') as Exphbs;
   const branchesPath = `${directory}/.git/refs/heads`;
   const headPath = `${directory}/.git/HEAD`;
 

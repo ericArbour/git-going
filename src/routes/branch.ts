@@ -1,6 +1,7 @@
 import path from 'path';
 import { Router } from 'express';
 import chokidar from 'chokidar';
+import NodeGit from 'nodegit';
 import {
   commitToCommitSummary,
   getBranch,
@@ -12,7 +13,7 @@ const branchRouter = Router();
 branchRouter.get('/branch/:name', async (req, res) => {
   try {
     const branchName = req.params.name;
-    const repo = req.app.get('repo');
+    const repo = req.app.get('repo') as NodeGit.Repository;
     const branch = await getBranch(repo, branchName);
     const commits = await getBranchCommits(repo, branch);
     const commitSummaries = commits.map(commitToCommitSummary);
@@ -29,9 +30,9 @@ branchRouter.get('/branch/:name', async (req, res) => {
 
 branchRouter.get('/branch/sse/:name', async (req, res) => {
   const branchName = req.params.name;
-  const repo = req.app.get('repo');
-  const directory = req.app.get('directory');
-  const viewInstance = req.app.get('view-instance');
+  const repo = req.app.get('repo') as NodeGit.Repository;
+  const directory = req.app.get('directory') as string;
+  const viewInstance = req.app.get('view-instance') as Exphbs;
   const branchPath = `${directory}/.git/refs/heads/${branchName}`;
   const headPath = `${directory}/.git/HEAD`;
 
