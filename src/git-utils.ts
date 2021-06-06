@@ -35,14 +35,18 @@ export async function getBranchCommits(
   return await walker.getCommits(100);
 }
 
-export interface ViewCommit {
+export interface SummaryCommit {
   sha: string;
   message: string;
 }
 
-export function commitToViewCommit(commit: NodeGit.Commit): ViewCommit {
+export function commitToSummaryCommit(commit: NodeGit.Commit): SummaryCommit {
+  const message = commit.message();
+  const messageSummary =
+    message.length > 80 ? message.substring(0, 77) + '...' : message;
+
   return {
     sha: commit.sha().substring(0, 7),
-    message: commit.message(),
+    message: messageSummary,
   };
 }

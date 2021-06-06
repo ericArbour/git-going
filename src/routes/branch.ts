@@ -1,7 +1,11 @@
 import path from 'path';
 import { Router } from 'express';
 import chokidar from 'chokidar';
-import { commitToViewCommit, getBranch, getBranchCommits } from '../git-utils';
+import {
+  commitToSummaryCommit,
+  getBranch,
+  getBranchCommits,
+} from '../git-utils';
 
 const branchRouter = Router();
 
@@ -11,10 +15,10 @@ branchRouter.get('/branch/:name', async (req, res) => {
     const repo = req.app.get('repo');
     const branch = await getBranch(repo, branchName);
     const commits = await getBranchCommits(repo, branch);
-    const viewCommits = commits.map(commitToViewCommit);
+    const summmaryCommits = commits.map(commitToSummaryCommit);
 
     res.render('branch', {
-      commits: viewCommits,
+      commits: summmaryCommits,
       branchName,
     });
   } catch (e) {
@@ -59,10 +63,10 @@ branchRouter.get('/branch/sse/:name', async (req, res) => {
       try {
         const branch = await getBranch(repo, branchName);
         const commits = await getBranchCommits(repo, branch);
-        const viewCommits = commits.map(commitToViewCommit);
+        const summaryCommits = commits.map(commitToSummaryCommit);
         const template = await viewInstance.render(
           path.join(__dirname, '../views/branch-sse.hbs'),
-          { commits: viewCommits, branchName },
+          { commits: summaryCommits, branchName },
         );
         const line = template.replace(/\n/g, '');
 
