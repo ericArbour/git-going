@@ -35,12 +35,26 @@ export async function getBranchCommits(
   return await walker.getCommits(100);
 }
 
-export interface SummaryCommit {
+export interface BranchSummary {
+  name: string;
+  isHead: boolean;
+}
+
+export function branchToBranchSummary(
+  branch: NodeGit.Reference,
+): BranchSummary {
+  return {
+    name: branch.name().replace('refs/heads/', ''),
+    isHead: branch.isHead(),
+  };
+}
+
+export interface CommitSummary {
   sha: string;
   message: string;
 }
 
-export function commitToSummaryCommit(commit: NodeGit.Commit): SummaryCommit {
+export function commitToCommitSummary(commit: NodeGit.Commit): CommitSummary {
   const message = commit.message();
   const messageSummary =
     message.length > 80 ? message.substring(0, 77) + '...' : message;

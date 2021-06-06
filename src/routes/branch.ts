@@ -2,7 +2,7 @@ import path from 'path';
 import { Router } from 'express';
 import chokidar from 'chokidar';
 import {
-  commitToSummaryCommit,
+  commitToCommitSummary,
   getBranch,
   getBranchCommits,
 } from '../git-utils';
@@ -15,10 +15,10 @@ branchRouter.get('/branch/:name', async (req, res) => {
     const repo = req.app.get('repo');
     const branch = await getBranch(repo, branchName);
     const commits = await getBranchCommits(repo, branch);
-    const summmaryCommits = commits.map(commitToSummaryCommit);
+    const commitSummaries = commits.map(commitToCommitSummary);
 
     res.render('branch', {
-      commits: summmaryCommits,
+      commits: commitSummaries,
       branchName,
     });
   } catch (e) {
@@ -29,8 +29,9 @@ branchRouter.get('/branch/:name', async (req, res) => {
 branchRouter.get('/branch/sse/:name', async (req, res) => {
   const branchName = req.params.name;
   const repo = req.app.get('repo');
+  const directory = req.app.get('directory');
   const viewInstance = req.app.get('view-instance');
-  const branchPath = `/.git/refs/heads/${branchName}`;
+  const branchPath = `${directory}/.git/refs/heads/${branchName}`;
 
   console.log(`connected to /branches/see/${branchName}`);
 
@@ -44,7 +45,7 @@ branchRouter.get('/branch/sse/:name', async (req, res) => {
   // Tell the client to retry every 10 seconds if connectivity is lost
   res.write('retry: 10000\n\n');
 
-  const watcher = chokidar.watch(process.cwd() + branchPath, {
+  const watcher = chokidar.watch(branchPath, {
     ignoreInitial: true,
   });
 
@@ -63,10 +64,10 @@ branchRouter.get('/branch/sse/:name', async (req, res) => {
       try {
         const branch = await getBranch(repo, branchName);
         const commits = await getBranchCommits(repo, branch);
-        const summaryCommits = commits.map(commitToSummaryCommit);
+        const commitSummaries = commits.map(commitToCommitSummary);
         const template = await viewInstance.render(
           path.join(__dirname, '../views/branch-sse.hbs'),
-          { commits: summaryCommits, branchName },
+          { commits: commitSummaries, branchName },
         );
         const line = template.replace(/\n/g, '');
 

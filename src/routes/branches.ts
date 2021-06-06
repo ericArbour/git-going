@@ -2,24 +2,24 @@ import path from 'path';
 import { Router } from 'express';
 import chokidar from 'chokidar';
 
-import { getLocalBranches } from '../git-utils';
+import { branchToBranchSummary, getLocalBranches } from '../git-utils';
 
 const branchesRouter = Router();
 
 branchesRouter.get('/branches', async (req, res) => {
   const repo = req.app.get('repo');
   const branches = await getLocalBranches(repo);
-  const branchNames = branches.map((branch) =>
-    branch.name().replace('refs/heads/', ''),
-  );
+  const branchSummaries = branches.map(branchToBranchSummary);
 
-  res.render('branches', { branches: branchNames });
+  res.render('branches', { branches: branchSummaries });
 });
 
 branchesRouter.get('/branches/sse', async (req, res) => {
   const repo = req.app.get('repo');
+  const directory = req.app.get('directory');
   const viewInstance = req.app.get('view-instance');
-  const branchesPath = '/.git/refs/heads';
+  const branchesPath = `${directory}/.git/refs/heads`;
+  const headPath = `${directory}/.git/HEAD`;
 
   console.log('connected to /branches/see');
 
@@ -33,7 +33,7 @@ branchesRouter.get('/branches/sse', async (req, res) => {
   // Tell the client to retry every 10 seconds if connectivity is lost
   res.write('retry: 10000\n\n');
 
-  const watcher = chokidar.watch(process.cwd() + branchesPath, {
+  const watcher = chokidar.watch([branchesPath, headPath], {
     ignoreInitial: true,
   });
 
@@ -41,12 +41,10 @@ branchesRouter.get('/branches/sse', async (req, res) => {
     console.log(`${branchesPath} change detected`);
     try {
       const branches = await getLocalBranches(repo);
-      const branchNames = branches.map((branch) =>
-        branch.name().replace('refs/heads/', ''),
-      );
+      const branchSummaries = branches.map(branchToBranchSummary);
       const template = await viewInstance.render(
         path.join(__dirname, '../views/branches-sse.hbs'),
-        { branches: branchNames },
+        { branches: branchSummaries },
       );
       const line = template.replace(/\n/g, '');
 

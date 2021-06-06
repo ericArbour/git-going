@@ -52,6 +52,7 @@ async function main() {
   app.set('view engine', 'hbs');
   app.set('view-instance', viewInstance);
   app.set('repo', repo);
+  app.set('directory', argv.d);
 
   app.use(express.static(path.resolve(__dirname, '../public')));
 

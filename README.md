@@ -17,3 +17,4 @@ NodeGit https://www.nodegit.org/
 1. Head commits.
 2. Remote branches.
 3. Branch commit compare.
+4. Commit details.

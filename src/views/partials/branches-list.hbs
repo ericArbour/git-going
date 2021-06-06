@@ -1,7 +1,9 @@
 <ul>
   {{#each branches}}
   <li>
-    <a href="/branch/{{encodeURIComponent this}}" data-turbo-frame="branch">{{this}}</a>
+    <a href="/branch/{{encodeURIComponent this.name}}" data-turbo-frame="branch">
+      {{this.name}}{{#if this.isHead}} *HEAD{{/if}}
+    </a>
   </li>
   {{/each}}
 </ul>
