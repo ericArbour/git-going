@@ -7,8 +7,8 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 import { getRepository } from './git-utils';
-import { branchesHandler, branchesSseHandler } from './routes/branches';
-import { branchHandler, branchSsehandler } from './routes/branch';
+import { branchesRouter } from './routes/branches';
+import { branchRouter } from './routes/branch';
 
 async function main() {
   const argv = await yargs(hideBin(process.argv))
@@ -59,10 +59,8 @@ async function main() {
     res.render('index');
   });
 
-  app.get('/branches', branchesHandler);
-  app.get('/branches/sse', branchesSseHandler);
-  app.get('/branch/:name', branchHandler);
-  app.get('/branch/sse/:name', branchSsehandler);
+  app.use(branchesRouter);
+  app.use(branchRouter);
 
   app.listen(argv.p, () => console.log(`Listening on port ${argv.p}...`));
 }

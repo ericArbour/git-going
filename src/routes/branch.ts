@@ -1,9 +1,11 @@
 import path from 'path';
-import { RequestHandler } from 'express';
+import { Router } from 'express';
 import chokidar from 'chokidar';
 import { commitToViewCommit, getBranch, getBranchCommits } from '../git-utils';
 
-export const branchHandler: RequestHandler = async (req, res) => {
+const branchRouter = Router();
+
+branchRouter.get('/branch/:name', async (req, res) => {
   try {
     const branchName = req.params.name;
     const repo = req.app.get('repo');
@@ -18,9 +20,9 @@ export const branchHandler: RequestHandler = async (req, res) => {
   } catch (e) {
     res.status(404).send(e.message);
   }
-};
+});
 
-export const branchSsehandler: RequestHandler = async (req, res) => {
+branchRouter.get('/branch/sse/:name', async (req, res) => {
   const branchName = req.params.name;
   const repo = req.app.get('repo');
   const viewInstance = req.app.get('view-instance');
@@ -76,4 +78,6 @@ export const branchSsehandler: RequestHandler = async (req, res) => {
     console.log(`disconnected from /branches/see/${branchName}`);
     watcher.close().then(() => console.log(`${branchPath} watcher closed`));
   });
-};
+});
+
+export { branchRouter };

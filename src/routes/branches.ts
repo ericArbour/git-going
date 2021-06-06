@@ -1,10 +1,12 @@
 import path from 'path';
+import { Router } from 'express';
 import chokidar from 'chokidar';
-import { RequestHandler } from 'express';
 
 import { getLocalBranches } from '../git-utils';
 
-export const branchesHandler: RequestHandler = async (req, res) => {
+const branchesRouter = Router();
+
+branchesRouter.get('/branches', async (req, res) => {
   const repo = req.app.get('repo');
   const branches = await getLocalBranches(repo);
   const branchNames = branches.map((branch) =>
@@ -12,9 +14,9 @@ export const branchesHandler: RequestHandler = async (req, res) => {
   );
 
   res.render('branches', { branches: branchNames });
-};
+});
 
-export const branchesSseHandler: RequestHandler = async (req, res) => {
+branchesRouter.get('/branches/sse', async (req, res) => {
   const repo = req.app.get('repo');
   const viewInstance = req.app.get('view-instance');
   const branchesPath = '/.git/refs/heads';
@@ -61,4 +63,6 @@ export const branchesSseHandler: RequestHandler = async (req, res) => {
       console.log(`${branchesPath} watcher closed`);
     });
   });
-};
+});
+
+export { branchesRouter };
