@@ -56,8 +56,11 @@ export interface CommitSummary {
 
 export function commitToCommitSummary(commit: NodeGit.Commit): CommitSummary {
   const message = commit.message();
+  const messageFirstLine = message.split('\n')[0];
   const messageSummary =
-    message.length > 80 ? message.substring(0, 77) + '...' : message;
+    messageFirstLine.length > 80
+      ? messageFirstLine.substring(0, 77) + '...'
+      : messageFirstLine;
 
   return {
     sha: commit.sha().substring(0, 7),
